@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CensusAnalyzer">
+    <output-path>$PROJECT_DIR$/out/artifacts/CensusAnalyzer</output-path>
+    <root id="archive" name="CensusAnalyzer.jar">
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/censusanalyser/OpenCSVBuilder.java" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/censusanalyser/ICSVBuilder.java" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/censusanalyser/CSVBuilderException.java" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/censusanalyser/CSVBuilderFactory.java" />
+    </root>
+  </artifact>
+</component>
