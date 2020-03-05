@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class CensusLoader {
-    public <E> Map<String, CensusDTO> loadCensusData(String csvFilePath, Class<E> censusCSVClass) throws CensusAnalyserException {
+    public <E> Map<String, CensusDTO> loadCensusData( Class<E> censusCSVClass, String... csvFilePath) throws CensusAnalyserException {
         Map<String, CensusDTO> censusCSVMap = new HashMap<>();
         try (
-                Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+                Reader reader = Files.newBufferedReader(Paths.get(csvFilePath[0]));) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
             Iterator<E> csvFileIterator = csvBuilder.getCSVFileIterator(reader, censusCSVClass);
             Iterable<E> csvIterable = () -> csvFileIterator;
@@ -27,7 +27,8 @@ public class CensusLoader {
                         .map(USCensusCSV.class::cast)
                         .forEach(csvState -> censusCSVMap.put(csvState.state, new CensusDTO(csvState)));
             }
-            //collect = censusCSVMap.values().stream().collect(Collectors.toList());
+            if(csvFilePath.length==1)return censusCSVMap;
+            this.loadIndiaStateCode(censusCSVMap,csvFilePath[1]);
             return censusCSVMap;
         } catch (
                 IOException e) {
@@ -37,4 +38,21 @@ public class CensusLoader {
             throw new CensusAnalyserException(e.getMessage(), CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
         }
     }
+
+    private int loadIndiaStateCode(Map<String, CensusDTO> censusCSVMap, String csvFilePath) throws CensusAnalyserException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+            Iterator<IndiaStateCodeCSV> censusCSVIterator = new OpenCSVBuilder().getCSVFileIterator(reader, IndiaStateCodeCSV.class);
+            Iterable<IndiaStateCodeCSV> csvIterable = () -> censusCSVIterator;
+            StreamSupport.stream(csvIterable.spliterator(), false)
+                    .filter(csvState -> censusCSVMap.get(csvState.state) != null)
+                    .forEach(csvState -> censusCSVMap.get(csvState.state).stateCode = csvState.stateCode);
+            return censusCSVMap.size();
+        } catch (IOException e) {
+            throw new CensusAnalyserException(e.getMessage(),
+                    CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
+        } catch (IllegalStateException e) {
+            throw new CensusAnalyserException(e.getMessage(), CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
+        }
+    }
+
 }

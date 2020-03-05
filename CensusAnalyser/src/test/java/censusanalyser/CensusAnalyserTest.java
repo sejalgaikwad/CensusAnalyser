@@ -37,11 +37,11 @@ public class CensusAnalyserTest {
     public void givenIndiaStateCode_ShouldReturnExactPath() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
-            int numOfStateCode = censusAnalyser.loadIndiaStateCode(INDIA_STATE_CODE_CSV_FILE_PATH);
+            int numOfStateCode = censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH, INDIA_STATE_CODE_CSV_FILE_PATH);
             Assert.assertEquals(29, numOfStateCode);
         } catch (CensusAnalyserException e) {
             e.printStackTrace();
+
         }
     }
 
