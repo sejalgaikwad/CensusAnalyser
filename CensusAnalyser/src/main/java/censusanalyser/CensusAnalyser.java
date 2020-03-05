@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class CensusAnalyser {
+    public enum Country{India, US};
     List<CensusDTO> collect = null;
     Map<String, CensusDTO> censusCSVMap = null;
     //Map<String, CensusDTO> censusStateMap = null;
@@ -20,23 +21,10 @@ public class CensusAnalyser {
         this.censusCSVMap = new TreeMap<String, CensusDTO>();
     }
 
-    public int loadIndiaCensusData(String... csvFilePath) throws CensusAnalyserException {
-        censusCSVMap = new CensusLoader().loadCensusData( IndiaCensusCSV.class,csvFilePath);
+    public int loadCensusData(Country country, String... csvFilePath) throws CensusAnalyserException {
+        censusCSVMap = new CensusLoader().loadCensusData( country,csvFilePath);
         return censusCSVMap.size();
     }
-
-    public int loadUSCensusData(String... csvFilePath) throws CensusAnalyserException {
-        censusCSVMap = new CensusLoader().loadCensusData(USCensusCSV.class, csvFilePath);
-        return censusCSVMap.size();
-    }
-
-
-//    private <E> int getCount(Iterator<E> iterator) {
-//        Iterable<E> csvIterable = () -> iterator;
-//        int namOfEateries = (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
-//        return namOfEateries;
-//    }
-
 
     public String getStateWiseSortedData() throws CensusAnalyserException {
         collect= censusCSVMap.values().stream().collect(Collectors.toList());
@@ -69,5 +57,11 @@ public class CensusAnalyser {
         String sortedStateCensus = new Gson().toJson(collect);
         return sortedStateCensus;
     }
-
 }
+
+
+//    private <E> int getCount(Iterator<E> iterator) {
+//        Iterable<E> csvIterable = () -> iterator;
+//        int namOfEateries = (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
+//        return namOfEateries;
+//    }

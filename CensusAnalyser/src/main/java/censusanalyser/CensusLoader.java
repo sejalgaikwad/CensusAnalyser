@@ -11,7 +11,16 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class CensusLoader {
-    public <E> Map<String, CensusDTO> loadCensusData( Class<E> censusCSVClass, String... csvFilePath) throws CensusAnalyserException {
+    public <E> Map<String, CensusDTO> loadCensusData(CensusAnalyser.Country country, String... csvFilePath) throws CensusAnalyserException {
+        if(country.equals(CensusAnalyser.Country.India)){
+            return this.loadCensusData(IndiaCensusCSV.class,csvFilePath);
+        }
+        else if(country.equals(CensusAnalyser.Country.US)){
+            return this.loadCensusData(USCensusCSV.class,csvFilePath);
+        }
+        else throw new CensusAnalyserException("Incorrect Country",CensusAnalyserException.ExceptionType.INVALID_COUNTRY);
+    }
+        private <E> Map<String, CensusDTO> loadCensusData( Class<E> censusCSVClass, String... csvFilePath) throws CensusAnalyserException {
         Map<String, CensusDTO> censusCSVMap = new HashMap<>();
         try (
                 Reader reader = Files.newBufferedReader(Paths.get(csvFilePath[0]));) {
