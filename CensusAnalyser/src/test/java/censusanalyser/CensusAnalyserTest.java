@@ -68,15 +68,6 @@ public class CensusAnalyserTest {
     }
 
     @Test
-    public void givenIndiaCensusData_WhenSortedOnState_ShouldReturnPopulateDensity() throws CensusAnalyserException {
-        CensusAnalyser censusAnalyser = new CensusAnalyser();
-        censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
-        String sortedCensusData = censusAnalyser.getPopulateDensity();
-        IndiaCensusCSV[] censusCSV = new Gson().fromJson(sortedCensusData, IndiaCensusCSV[].class);
-        Assert.assertEquals(1102, censusCSV[28].densityPerSqKm);
-    }
-
-    @Test
     public void givenUSCensusCSVData_ReturnsCorrectRecords() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
