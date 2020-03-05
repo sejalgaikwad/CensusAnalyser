@@ -37,8 +37,27 @@ public class CensusAnalyser {
         }
     }
 
+    public int loadUSCensusData(String csvFilePath) throws CensusAnalyserException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+            ICSVBuilder csvBuilder = CSVBuilderFactory.createCSVBuilder();
+            Iterator<USCensusCSV> csvFileIterator = csvBuilder.getCSVFileIterator(reader, USCensusCSV.class);
+            while (csvFileIterator.hasNext()) {
+                USCensusCSV usCensusCSV = csvFileIterator.next();
+                this.censusCSVMap.put(usCensusCSV.state, new IndiaCensusDTO(usCensusCSV));
+            }
+            collect = censusCSVMap.values().stream().collect(Collectors.toList());
+            return censusCSVMap.size();
+        } catch (IOException e) {
+            throw new CensusAnalyserException(e.getMessage(),
+                    CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
+        } catch (IllegalStateException e) {
+            throw new CensusAnalyserException(e.getMessage(), CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
+        }
+    }
+
     public int loadIndiaStateCode(String csvFilePath) throws CensusAnalyserException {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+
             Iterator<IndiaStateCodeCSV> censusCSVIterator = new OpenCSVBuilder().getCSVFileIterator(reader, IndiaStateCodeCSV.class);
             Iterable<IndiaStateCodeCSV> csvIterable = () -> censusCSVIterator;
             StreamSupport.stream(csvIterable.spliterator(),false)
@@ -91,9 +110,11 @@ public class CensusAnalyser {
     }
 
     public String getPopulateDensity() {
-        Comparator<IndiaCensusDTO> censusComparator = Comparator.comparing(census -> census.densityPerSqKm);
+        Comparator<IndiaCensusDTO> censusComparator = Comparator.comparing(census -> census.populationDensity);
         this.sort(censusComparator);
         String sortedStateCensus = new Gson().toJson(collect);
         return sortedStateCensus;
     }
+
+
 }
