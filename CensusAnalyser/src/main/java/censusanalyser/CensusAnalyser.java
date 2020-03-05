@@ -43,7 +43,7 @@ public class CensusAnalyser {
             Iterable<IndiaStateCodeCSV> csvIterable = () -> censusCSVIterator;
             StreamSupport.stream(csvIterable.spliterator(),false)
                     .filter(csvState -> censusCSVMap.get(csvState.state) != null)
-                    .forEach(csvState -> censusCSVMap.get(csvState.state).state = csvState.state );
+                    .forEach(csvState -> censusCSVMap.get(csvState.state).stateCode = csvState.stateCode );
             return censusCSVMap.size();
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
