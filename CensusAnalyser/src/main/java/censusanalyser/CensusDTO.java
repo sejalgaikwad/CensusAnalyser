@@ -21,4 +21,6 @@ public class CensusDTO {
         totalArea = usCensusCSV.totalArea;
         populationDensity = usCensusCSV.populationDensity;
     }
+
+
 }

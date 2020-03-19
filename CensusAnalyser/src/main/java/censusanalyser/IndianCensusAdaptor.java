@@ -10,17 +10,25 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class CensusLoader {
-    public <E> Map<String, CensusDTO> loadCensusData(CensusAnalyser.Country country, String... csvFilePath) throws CensusAnalyserException {
-        if(country.equals(CensusAnalyser.Country.India)){
-            return this.loadCensusData(IndiaCensusCSV.class,csvFilePath);
-        }
-        else if(country.equals(CensusAnalyser.Country.US)){
-            return this.loadCensusData(USCensusCSV.class,csvFilePath);
-        }
-        else throw new CensusAnalyserException("Incorrect Country",CensusAnalyserException.ExceptionType.INVALID_COUNTRY);
+public class IndianCensusAdaptor extends CensusAdaptor {
+
+    @Override
+    public <E> Map<String, CensusDTO> loadCensusData(String... csvFilePath) {
+        Map<String, CensusDTO> censusStateMap = super.loadCensusData(IndiaCensusCSV.class, csvFilePath[0]);
+        this.loadIndiaStateCode(censusStateMap, csvFilePath[1]);
+        return censusStateMap;
     }
-        private <E> Map<String, CensusDTO> loadCensusData( Class<E> censusCSVClass, String... csvFilePath) throws CensusAnalyserException {
+
+    public <E> Map<String, CensusDTO> loadCensusData(CensusAnalyser.Country country, String... csvFilePath) throws CensusAnalyserException {
+        if (country.equals(CensusAnalyser.Country.INDIA)) {
+            return this.loadCensusData(IndiaCensusCSV.class, csvFilePath);
+        } else if (country.equals(CensusAnalyser.Country.US)) {
+            return this.loadCensusData(USCensusCSV.class, csvFilePath);
+        } else
+            throw new CensusAnalyserException("Incorrect Country", CensusAnalyserException.ExceptionType.INVALID_COUNTRY);
+    }
+
+    private <E> Map<String, CensusDTO> loadCensusData(Class<E> censusCSVClass, String... csvFilePath) throws CensusAnalyserException {
         Map<String, CensusDTO> censusCSVMap = new HashMap<>();
         try (
                 Reader reader = Files.newBufferedReader(Paths.get(csvFilePath[0]));) {
@@ -36,8 +44,8 @@ public class CensusLoader {
                         .map(USCensusCSV.class::cast)
                         .forEach(csvState -> censusCSVMap.put(csvState.state, new CensusDTO(csvState)));
             }
-            if(csvFilePath.length==1)return censusCSVMap;
-            this.loadIndiaStateCode(censusCSVMap,csvFilePath[1]);
+            if (csvFilePath.length == 1) return censusCSVMap;
+            this.loadIndiaStateCode(censusCSVMap, csvFilePath[1]);
             return censusCSVMap;
         } catch (
                 IOException e) {
@@ -63,5 +71,4 @@ public class CensusLoader {
             throw new CensusAnalyserException(e.getMessage(), CensusAnalyserException.ExceptionType.UNABLE_TO_PARSE);
         }
     }
-
 }
